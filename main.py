@@ -24,6 +24,15 @@ import phonenumbers
 class Field:
     def __init__(self, value) -> None:
         self.value = value
+        self.__value = None
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def name(self, new_value: str):
+        self.__value = new_value
 
 
 class Name(Field):
