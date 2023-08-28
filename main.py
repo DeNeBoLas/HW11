@@ -1,6 +1,6 @@
 from collections import UserDict
 from datetime import date
-import re
+import itertools
 
 
 class Field:
@@ -100,16 +100,38 @@ class AddressBook(UserDict):
     def add_record(self, record):
         if not isinstance(record, Record):
             raise ValueError("Record must be an instance of the Record class")
+        # if type(record) != Record:
+        #     raise TypeError("")
         self.data[record.name.value] = record
 
     def find_record(self, value):
         return self.data.get(value)
-    
-    # def iterator(self, item_number: int) -> str:
+
+    # def __next__(self):
+    #     if n < len(self.data):
+    #         n += 1
+    #         return self.data[record.name.value]
+    #     raise StopIteration
 
     # def __iter__(self):
-    #     # return Iterable()
-    #     pass
+    #     return AddressBook()
+
+    # def chunks(seq, n):
+    #     it = iter(seq)
+    #     while True:
+    #         t = tuple(itertools.islice(it))
+    #         if len(t) == 0:
+    #             break
+    #         yield t
+
+    def iterator(self) -> str:
+        return f"{self.data}"
+
+    # for c in chunks(self.data.items, n):
+    #     yield c
+
+    # def __iter__(self):
+    #     return chunks()
 
 
 if __name__ == "__main__":
@@ -117,5 +139,31 @@ if __name__ == "__main__":
     phone = Phone("39447509105")
     bday = Birthday("1234-12-12")
 
+    name_1 = Name("Tom")
+    phone_1 = Phone("39447509105")
+    bday_1 = Birthday("1234-12-12")
+
+    name_2 = Name("Ket")
+    phone_2 = Phone("39447509105")
+    bday_2 = Birthday("1234-12-12")
+
+    name_3 = Name("Gim")
+    phone_3 = Phone("7654689")
+    bday_3 = Birthday("1298-10-17")
+
     record = Record(name, phone, bday)
-    print(record.)
+    record_1 = Record(name_1, phone_1, bday_1)
+    # record.add_phone("2345657")
+    record_2 = Record(name_2, phone_2, bday_2)
+    record_3 = Record(name_3, phone_3, bday_3)
+    print(record.name, [p.value for p in record.phones], record.birthday)
+
+    ab = AddressBook()
+    ab.add_record(record)
+    ab.add_record(record_1)
+    ab.add_record(record_2)
+    ab.add_record(record_3)
+    print(ab.data)
+
+    for el in ab.items():
+        print(el)
