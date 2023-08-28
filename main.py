@@ -107,7 +107,7 @@ class AddressBook(UserDict):
     def find_record(self, value):
         return self.data.get(value)
 
-    # def __next__(self):
+    # def __next__(self): # TODO  як резалізувати вивід даних через  __next__ та __iter__
     #     if n < len(self.data):
     #         n += 1
     #         return self.data[record.name.value]
@@ -124,7 +124,7 @@ class AddressBook(UserDict):
     #             break
     #         yield t
 
-    def iterator(self) -> str:
+    def iterator(self) -> tuple:
         return f"{self.data}"
 
     # for c in chunks(self.data.items, n):
@@ -165,5 +165,5 @@ if __name__ == "__main__":
     ab.add_record(record_3)
     print(ab.data)
 
-    for el in ab.items():
+    for el in ab:  # TODO як вивести номер та др
         print(el)
