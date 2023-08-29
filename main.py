@@ -1,6 +1,5 @@
 from collections import UserDict
 from datetime import date
-import itertools
 
 
 class Field:
@@ -30,7 +29,7 @@ class Name(Field):
         if not name.isalpha():
             raise ValueError("not valid name only alpha")
         Field.value.fset(self, name)
-        # super(Name, Name).value.fset(self, name)
+        # super(Name, Name).value.fset(self, name) # decorator call
 
 
 class Phone(Field):
@@ -95,8 +94,13 @@ class Record:
             b_day = b_day.replace(year=today.year + 1)
         return (b_day - today).days
 
+    def __str__(self):  # реалізуємо магічний метод для виводу контактів
+        return f"{self.name.value} {[ph.value for ph in self.phones]} {self.birthday.value}"
+
 
 class AddressBook(UserDict):
+    N = 2  # додамо змінну классу, для контролю паггінації, по замовчюванню 2 записи на 1 сторінку
+
     def add_record(self, record):
         if not isinstance(record, Record):
             raise ValueError("Record must be an instance of the Record class")
@@ -107,31 +111,47 @@ class AddressBook(UserDict):
     def find_record(self, value):
         return self.data.get(value)
 
-    # def __next__(self): # TODO  як резалізувати вивід даних через  __next__ та __iter__
-    #     if n < len(self.data):
-    #         n += 1
-    #         return self.data[record.name.value]
-    #     raise StopIteration
+    def iterator(self, n) -> list[dict]:
+        contact_list = []  # список записів контактів
+        if n:
+            AddressBook.N = n
+        for record in self.data.values():
+            contact_list.append(record)
 
-    # def __iter__(self):
-    #     return AddressBook()
+        return self.__next__()
 
-    # def chunks(seq, n):
-    #     it = iter(seq)
-    #     while True:
-    #         t = tuple(itertools.islice(it))
-    #         if len(t) == 0:
-    #             break
-    #         yield t
+    def __iter__(self):
+        n_list = []
+        counter = 0
+        for contact in self.data.values():
+            n_list.append(contact)
+            counter += 1
+            if (
+                counter >= AddressBook.N
+            ):  # якщо вже створено список із заданої кількості записів
+                yield n_list
+                n_list.clear()
+                counter = 0
+        yield n_list
 
-    def iterator(self) -> tuple:
-        return f"{self.data}"
-
-    # for c in chunks(self.data.items, n):
-    #     yield c
-
-    # def __iter__(self):
-    #     return chunks()
+    def __next__(self):
+        generator = self.__iter__()
+        page = 1
+        while True:
+            user_input = input("Press ENTER")
+            if user_input == "":
+                try:
+                    result = next(generator)
+                    if result:
+                        print(f"{'*' * 20} Page {page} {'*' * 20}")
+                        page += 1
+                    for var in result:
+                        print(var)
+                except StopIteration:
+                    print(f"{'*' * 20} END {'*' * 20}")
+                    break
+            else:
+                break
 
 
 if __name__ == "__main__":
@@ -153,17 +173,16 @@ if __name__ == "__main__":
 
     record = Record(name, phone, bday)
     record_1 = Record(name_1, phone_1, bday_1)
-    # record.add_phone("2345657")
     record_2 = Record(name_2, phone_2, bday_2)
     record_3 = Record(name_3, phone_3, bday_3)
-    print(record.name, [p.value for p in record.phones], record.birthday)
+    # print(record.name, [p.value for p in record.phones], record.birthday)
 
     ab = AddressBook()
     ab.add_record(record)
     ab.add_record(record_1)
     ab.add_record(record_2)
     ab.add_record(record_3)
-    print(ab.data)
 
-    for el in ab:  # TODO як вивести номер та др
-        print(el)
+    print(
+        ab.iterator(2)
+    )  # викликаємо метод ітератор, та можемо передати n - число записів
